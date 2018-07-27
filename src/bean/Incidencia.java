@@ -15,10 +15,12 @@ public class Incidencia {
 	private Date usuMod;
 	private boolean activa;
 	private Date dataTancament;
+	private String motiuTancament;
+	private boolean ignorada;
 	private String solicitant;
 	
 	public Incidencia() {
-		 
+		 this.idIncidencia = "-1";
 	}
 
 	public String getIdIncidencia() {
@@ -43,6 +45,17 @@ public class Incidencia {
 		}
 		return llistaIds;
 	}
+	
+	public boolean isAcabada(){
+		boolean acabada = true;
+		if (this.activa) {
+			if (this.llistaActuacions.getLlistaActuacions().size() == 0) acabada = false;
+			for (Actuacio actuacio: this.llistaActuacions.getLlistaActuacions()) {			
+				if (actuacio.isActiva()) acabada = false;
+			}
+		}
+		return acabada;
+	}
 
 	public void setLlistaActuacions(Resultat llistaActuacions) {
 		this.llistaActuacions = llistaActuacions;
@@ -65,7 +78,7 @@ public class Incidencia {
 	}
 	
 	public boolean isActiva() {
-		return activa;
+		return !this.isAcabada();
 	}
 
 	public void setActiva(boolean activa) {
@@ -124,5 +137,21 @@ public class Incidencia {
 
 	public void setSolicitant(String solicitant) {
 		this.solicitant = solicitant;
+	}
+
+	public String getMotiuTancament() {
+		return motiuTancament;
+	}
+
+	public void setMotiuTancament(String motiuTancament) {
+		this.motiuTancament = motiuTancament;
+	}
+
+	public boolean isIgnorada() {
+		return ignorada;
+	}
+
+	public void setIgnorada(boolean ignorada) {
+		this.ignorada = ignorada;
 	}
 }

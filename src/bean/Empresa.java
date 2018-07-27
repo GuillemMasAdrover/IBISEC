@@ -1,6 +1,7 @@
 package bean;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -8,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 
 import utils.Fitxers;
+import utils.Fitxers.Fitxer;
 
 public class Empresa {
  
@@ -41,12 +43,11 @@ public class Empresa {
 	   private Date dataValidesaFins;
 	   private Date dataModificacio;
 	   private String notariModificacio;
-	   private int protocolModificacio;
+	   private String protocolModificacio;
 	   private Date dataValidacio;
 	   private String entitatValidacio;
 	   private String tipus;
-	   private boolean eliminar;
-	   
+	   private Fitxer documentAdministrador;
 		public String getNom() {
 			return nom;
 		}
@@ -100,10 +101,10 @@ public class Empresa {
 		public void setNotariModificacio(String notariModificacio) {
 			this.notariModificacio = notariModificacio;
 		}
-		public int getProtocolModificacio() {
+		public String getProtocolModificacio() {
 			return protocolModificacio;
 		}
-		public void setProtocolModificacio(int protocolModificacio) {
+		public void setProtocolModificacio(String protocolModificacio) {
 			this.protocolModificacio = protocolModificacio;
 		}
 		public String getTipus() {
@@ -124,17 +125,32 @@ public class Empresa {
 			if (this.dataValidacio != null) dataString = df.format(this.dataValidacio);
 			return dataString;
 		}
-		public boolean isEliminar() {
-			return eliminar;
-		}
-		public void setEliminar(boolean eliminar) {
-			this.eliminar = eliminar;
-		}
 		public String getEntitatValidacio() {
 			return entitatValidacio;
 		}
+		public String getEntitatValidacioString() {
+			if (this.entitatValidacio != null) {
+				if(this.entitatValidacio.equals("caib")) {
+					return "Advocacia CAIB";
+				} else if (this.entitatValidacio.equals("estat")) {
+					return "Advocacia Estat";
+				} else if (this.entitatValidacio.equals("ibisec")) {
+					return "Assessoria jurídica IBISEC";
+				} else {
+					return this.entitatValidacio;
+				}
+			} else {
+				return "";
+			}
+		}
 		public void setEntitatValidacio(String entitatValidacio) {
 			this.entitatValidacio = entitatValidacio;
+		}
+		public Fitxer getDocumentAdministrador() {
+			return documentAdministrador;
+		}
+		public void setDocumentAdministrador(Fitxer documentAdministrador) {
+			this.documentAdministrador = documentAdministrador;
 		}
    }
 
@@ -167,15 +183,19 @@ public class Empresa {
    private String fax;
    private String email;
    private Date dataConstitucio;
-   private String objecteSocial;
+   private List<Fitxers.Fitxer> documentsEscrituraList;
+   private Fitxers.Fitxer documentREA;
    private String classificacioString;
+   private Fitxers.Fitxer classificacioFileROLECE;
+   private Fitxers.Fitxer classificacioFileJCCaib;
+   private Fitxers.Fitxer classificacioFileJCA;
+   private Date dataVigenciaClassificacioROLECE;
+   private Date dataVigenciaClassificacioJCCaib;
+   private Date dataVigenciaClassificacioJCA;
    private String administradorsString;
    private List<Administrador> administradors;   
-   private boolean acreditacio1;
    private Date dateExpAcreditacio1;
-   private boolean acreditacio2;
    private Date dateExpAcreditacio2;
-   private boolean acreditacio3;
    private Date dateExpAcreditacio3;
    private Fitxers.Fitxer solEconomica;
    private Date exerciciEconomic;
@@ -184,7 +204,17 @@ public class Empresa {
    private double ratioAP;
    private String informacioAdicional;
    private UTE ute;
-   
+   private boolean isPime;
+   private boolean activa;
+   private Empresa succesora;
+   private Fitxers.Fitxer succesoraFile;
+   private String motiuExtincio;
+   private Fitxers.Fitxer extincioFile;
+   private double totalPbasePeriodeAdjudicat;
+   private double totalPbasePeriode;
+   private double totalPLicPeriode;
+   private boolean prohibicioContractar;
+   private List<Fitxers.Fitxer> documentsProhibicioContractarList;
    
    public Empresa() {
  
@@ -277,14 +307,6 @@ public class Empresa {
 		this.dataConstitucio = dataConstitucio;
 	}
 	
-	public String getObjecteSocial() {
-		return objecteSocial;
-	}
-	
-	public void setObjecteSocial(String objecteSocial) {
-		this.objecteSocial = objecteSocial;
-	}
-	
 	public List<Classificacio> getClassificacio() {
 		List<Empresa.Classificacio> classificacioList = new ArrayList<Empresa.Classificacio>();
 		if (this.getClassificacioString() != null && !this.getClassificacioString().isEmpty()) {
@@ -307,14 +329,6 @@ public class Empresa {
 	
 	public void setAdministradors(List<Administrador> administradors) {
 		this.administradors = administradors;
-	}
-	
-	public boolean isAcreditacio1() {
-		return acreditacio1;
-	}
-	
-	public void setAcreditacio1(boolean acreditacio1) {
-		this.acreditacio1 = acreditacio1;
 	}
 	
 	public Date getDateExpAcreditacio1() {
@@ -342,15 +356,7 @@ public class Empresa {
 		}
 		return caducat;
 	}
-	
-	public boolean isAcreditacio2() {
-		return acreditacio2;
-	}
-	
-	public void setAcreditacio2(boolean acreditacio2) {
-		this.acreditacio2 = acreditacio2;
-	}
-	
+		
 	public Date getDateExpAcreditacio2() {
 		return dateExpAcreditacio2;
 	}
@@ -375,14 +381,6 @@ public class Empresa {
 			if (cad.before(Calendar.getInstance())) caducat = true;
 		}
 		return caducat;
-	}
-	
-	public boolean isAcreditacio3() {
-		return acreditacio3;
-	}
-	
-	public void setAcreditacio3(boolean acreditacio3) {
-		this.acreditacio3 = acreditacio3;
 	}
 	
 	public Date getDateExpAcreditacio3() {
@@ -481,18 +479,6 @@ public class Empresa {
 		this.registreMercantilData = registreMercantilData;
 	}
 	
-	public boolean isCaducatSolvenciaEconomica() {
-		//Caduca dia 30 de Juny el de fa 2 anys
-		boolean caducat = false;
-		if (this.registreMercantilData != null) {
-			Calendar cad = Calendar.getInstance();
-			cad.setTime(this.registreMercantilData);
-			cad.add(Calendar.MONTH, 6);
-			if (cad.before(Calendar.getInstance())) caducat = true;
-		}
-		return caducat;
-	}
-	
 	public double getRatioAP() {
 		return ratioAP;
 	}
@@ -510,6 +496,194 @@ public class Empresa {
 	}
 	public boolean isUte() {
 		return this.ute != null;
+	}
+	
+	public boolean isPime() {
+		return isPime;
+	}
+
+	public void setPime(boolean isPime) {
+		this.isPime = isPime;
+	}
+
+	public Fitxers.Fitxer getClassificacioFileROLECE() {
+		return classificacioFileROLECE;
+	}
+
+	public void setClassificacioFileROLECE(Fitxers.Fitxer classificacioFileROLECE) {
+		this.classificacioFileROLECE = classificacioFileROLECE;
+	}
+
+	public Fitxers.Fitxer getClassificacioFileJCCaib() {
+		return classificacioFileJCCaib;
+	}
+
+	public void setClassificacioFileJCCaib(Fitxers.Fitxer classificacioFileJCCaib) {
+		this.classificacioFileJCCaib = classificacioFileJCCaib;
+	}
+
+	public Fitxers.Fitxer getClassificacioFileJCA() {
+		return classificacioFileJCA;
+	}
+
+	public void setClassificacioFileJCA(Fitxers.Fitxer classificacioFileJCA) {
+		this.classificacioFileJCA = classificacioFileJCA;
+	}
+
+	public Date getDataVigenciaClassificacioROLECE() {
+		return dataVigenciaClassificacioROLECE;
+	}
+
+	public String getDataVigenciaClassificacioROLECEString() {
+		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");	
+		String dataString = "";
+		if (this.dataVigenciaClassificacioROLECE != null) dataString = df.format(this.dataVigenciaClassificacioROLECE);
+		return dataString;
+	}
+	
+	public void setDataVigenciaClassificacioROLECE(Date dataVigenciaClassificacioROLECE) {
+		this.dataVigenciaClassificacioROLECE = dataVigenciaClassificacioROLECE;
+	}
+
+	public Date getDataVigenciaClassificacioJCCaib() {
+		return dataVigenciaClassificacioJCCaib;
+	}
+	
+	public String getDataVigenciaClassificacioJCCaibString() {
+		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");	
+		String dataString = "";
+		if (this.dataVigenciaClassificacioJCCaib != null) dataString = df.format(this.dataVigenciaClassificacioJCCaib);
+		return dataString;
+	}
+
+	public void setDataVigenciaClassificacioJCCaib(Date dataVigenciaClassificacioJCCaib) {
+		this.dataVigenciaClassificacioJCCaib = dataVigenciaClassificacioJCCaib;
+	}
+
+	public Date getDataVigenciaClassificacioJCA() {
+		return dataVigenciaClassificacioJCA;
+	}
+	
+	public String getDataVigenciaClassificacioJCAString() {
+		DateFormat df = new SimpleDateFormat("dd/MM/yyyy");	
+		String dataString = "";
+		if (this.dataVigenciaClassificacioJCA != null) dataString = df.format(this.dataVigenciaClassificacioJCA);
+		return dataString;
+	}
+
+	public void setDataVigenciaClassificacioJCA(Date dataVigenciaClassificacioJCA) {
+		this.dataVigenciaClassificacioJCA = dataVigenciaClassificacioJCA;
+	}
+
+	public List<Fitxers.Fitxer> getDocumentsEscrituraList() {
+		return documentsEscrituraList;
+	}
+
+	public void setDocumentsEscrituraList(List<Fitxers.Fitxer> documentsEscrituraList) {
+		this.documentsEscrituraList = documentsEscrituraList;
+	}
+
+	public boolean isActiva() {
+		return activa;
+	}
+
+	public void setActiva(boolean activa) {
+		this.activa = activa;
+	}
+
+	public Empresa getSuccesora() {
+		return succesora;
+	}
+
+	public void setSuccesora(Empresa succesora) {
+		this.succesora = succesora;
+	}
+
+	public String getMotiuExtincio() {
+		return motiuExtincio;
+	}
+
+	public void setMotiuExtincio(String motiuExtincio) {
+		this.motiuExtincio = motiuExtincio;
+	}
+
+	public Fitxers.Fitxer getSuccesoraFile() {
+		return succesoraFile;
+	}
+
+	public void setSuccesoraFile(Fitxers.Fitxer succesoraFile) {
+		this.succesoraFile = succesoraFile;
+	}
+
+	public Fitxers.Fitxer getExtincioFile() {
+		return extincioFile;
+	}
+
+	public void setExtincioFile(Fitxers.Fitxer extincioFile) {
+		this.extincioFile = extincioFile;
+	}
+
+	public Fitxers.Fitxer getDocumentREA() {
+		return documentREA;
+	}
+
+	public void setDocumentREA(Fitxers.Fitxer documentREA) {
+		this.documentREA = documentREA;
+	}
+
+	public double getTotalPbasePeriode() {
+		return totalPbasePeriode;
+	}
+	
+	public String getTotalPbasePeriodeString() {
+		DecimalFormat num = new DecimalFormat("#,##0.00");
+	    return num.format(this.totalPbasePeriode) + '€';
+	}
+
+	public void setTotalPbasePeriode(double totalPbasePeriode) {
+		this.totalPbasePeriode = totalPbasePeriode;
+	}
+
+	public double getTotalPLicPeriode() {
+		return totalPLicPeriode;
+	}
+	
+	public String getTotalPLicPeriodeString() {
+		DecimalFormat num = new DecimalFormat("#,##0.00");
+	    return num.format(this.totalPLicPeriode) + '€';
+	}
+
+	public void setTotalPLicPeriode(double totalPLicPeriode) {
+		this.totalPLicPeriode = totalPLicPeriode;
+	}
+
+	public boolean isProhibicioContractar() {
+		return prohibicioContractar;
+	}
+
+	public void setProhibicioContractar(boolean prohibicioContractar) {
+		this.prohibicioContractar = prohibicioContractar;
+	}
+
+	public List<Fitxers.Fitxer> getDocumentsProhibicioContractarList() {
+		return documentsProhibicioContractarList;
+	}
+
+	public void setDocumentsProhibicioContractarList(List<Fitxers.Fitxer> documentsProhibicioContractarList) {
+		this.documentsProhibicioContractarList = documentsProhibicioContractarList;
+	}
+
+	public double getTotalPbasePeriodeAdjudicat() {
+		return totalPbasePeriodeAdjudicat;
+	}
+	
+	public String getTotalPbasePeriodeAdjudicatString() {
+		DecimalFormat num = new DecimalFormat("#,##0.00");
+	    return num.format(this.totalPbasePeriodeAdjudicat) + '€';
+	}
+
+	public void setTotalPbasePeriodeAdjudicat(double totalPbasePeriodeAdjudicat) {
+		this.totalPbasePeriodeAdjudicat = totalPbasePeriodeAdjudicat;
 	}
 
 }

@@ -1,11 +1,12 @@
 package bean;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 
 public class AssignacioCredit {
 	private String idAssignacio;	
-	private String idActuacio;
-	private String idInf;
+	private String idInforme;
+	private InformeActuacio informe;
 	private boolean reserva;
 	private User usuReserva;
 	private Date datareserva;
@@ -15,9 +16,11 @@ public class AssignacioCredit {
 	private String comentari;
 	private User usuCre;
 	private Date dataCre;
-	private String idPartida;
+	private Partida partida;
 	private double valorPA;
 	private double valorPD;
+	private boolean feder;
+	private boolean bei;
 	  
 	public AssignacioCredit(){
 		
@@ -29,22 +32,6 @@ public class AssignacioCredit {
 
 	public void setIdAssignacio(String idAssignacio) {
 		this.idAssignacio = idAssignacio;
-	}
-
-	public String getIdActuacio() {
-		return idActuacio;
-	}
-
-	public void setIdActuacio(String idActuacio) {
-		this.idActuacio = idActuacio;
-	}
-
-	public String getIdInf() {
-		return idInf;
-	}
-
-	public void setIdInf(String idInf) {
-		this.idInf = idInf;
 	}
 
 	public boolean isReserva() {
@@ -119,16 +106,21 @@ public class AssignacioCredit {
 		this.dataCre = dataCre;
 	}
 
-	public String getIdPartida() {
-		return idPartida;
+	public Partida getPartida() {
+		return partida;
 	}
 
-	public void setIdPartida(String idPartida) {
-		this.idPartida = idPartida;
+	public void setPartida(Partida partida) {
+		this.partida = partida;
 	}
 
 	public double getValorPA() {
 		return valorPA;
+	}
+	
+	public String getValorPAFormat() {
+		DecimalFormat num = new DecimalFormat("#,##0.00");
+	    return num.format(this.valorPA) + '€';
 	}
 
 	public void setValorPA(double valorPA) {
@@ -138,8 +130,45 @@ public class AssignacioCredit {
 	public double getValorPD() {
 		return valorPD;
 	}
+	
+	public String getValorPDFormat() {
+		DecimalFormat num = new DecimalFormat("#,##0.00");
+	    return num.format(this.valorPD) + '€';
+	}
 
 	public void setValorPD(double valorPD) {
 		this.valorPD = valorPD;
+	}
+
+	public boolean isFeder() {
+		return feder;
+	}
+
+	public void setFeder(boolean feder) {
+		this.feder = feder;
+	}
+
+	public boolean isBei() {
+		return bei;
+	}
+
+	public void setBei(boolean bei) {
+		this.bei = bei;
+	}
+
+	public String getIdInforme() {
+		return idInforme;
+	}
+
+	public void setIdInforme(String idInforme) {
+		this.idInforme = idInforme;
+	}
+
+	public InformeActuacio getInforme() {
+		return informe;
+	}
+
+	public void setInforme(InformeActuacio informe) {
+		this.informe = informe;
 	}
 }

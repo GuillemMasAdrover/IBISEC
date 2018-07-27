@@ -10,7 +10,9 @@ public class User {
 	private String carreg;
 	private String departament;
 	private String alias;
-	 
+	private int vacances;
+	private int permisos;
+	private boolean actiu;
 	   public User() {
 	 
 	   }
@@ -97,5 +99,29 @@ public class User {
 
 	public void setAlias(String alias) {
 		this.alias = alias;
+	}
+
+	public int getVacances() {
+		return vacances;
+	}
+
+	public void setVacances(int vacances) {
+		this.vacances = vacances;
+	}
+
+	public int getPermisos() {
+		return permisos;
+	}
+
+	public void setPermisos(int permisos) {
+		this.permisos = permisos;
+	}
+
+	public boolean isActiu() {
+		return actiu;
+	}
+
+	public void setActiu(boolean actiu) {
+		this.actiu = actiu;
 	}
 }

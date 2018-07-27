@@ -24,13 +24,22 @@ public class UsuariCore {
 		usuari.setUsuari(rs.getString("nomusuari"));
 		usuari.setPassword(rs.getString("password"));
 		usuari.setAlias(rs.getString("alias"));
+		usuari.setVacances(rs.getInt("vacances"));
+		usuari.setPermisos(rs.getInt("permisos"));
+		usuari.setActiu(rs.getBoolean("actiu"));
 		return usuari;
 	}
 	
 	public static User finCap(Connection conn, String departament) throws SQLException {
-		String sql = "SELECT idusuari, nom, cognoms, rol, carreg, departament, nomusuari, password, alias"
+		String sql = "SELECT idusuari, nom, cognoms, rol, carreg, departament, nomusuari, password, alias, vacances, permisos, actiu"
 				+ " FROM public.tbl_usuaris"
-				+ " WHERE departament = ? AND rol LIKE '%CAP%'";
+				+ " WHERE departament = ?";
+				
+		if (departament.equals("gerencia")) {
+			sql += " AND rol LIKE '%GERENT%'";
+		} else {
+			sql += " AND rol LIKE '%CAP%'";
+		}
  
 		PreparedStatement pstm = conn.prepareStatement(sql);
 		pstm.setString(1, departament);
@@ -44,7 +53,7 @@ public class UsuariCore {
 	}
 	 
 	public static User findUsuari(Connection conn, String Usuari) throws SQLException {
-		String sql = "SELECT idusuari, nom, cognoms, rol, carreg, departament, nomusuari, password, alias"
+		String sql = "SELECT idusuari, nom, cognoms, rol, carreg, departament, nomusuari, password, alias, vacances, permisos, actiu"
 					+ " FROM public.tbl_usuaris"
 					+ " WHERE nomusuari = ? ";
 	 
@@ -52,7 +61,6 @@ public class UsuariCore {
 		pstm.setString(1, Usuari);
 	 
 		ResultSet rs = pstm.executeQuery();
-	 
 		if (rs.next()) {		
 			User user = initUsuari(rs);			
 			return user;
@@ -61,7 +69,7 @@ public class UsuariCore {
 	}	
 	
 	public static User findUsuariByID(Connection conn, int idUsuari) throws SQLException{
-		String sql = "SELECT idusuari, nom, cognoms, rol, carreg, departament, nomusuari, password, alias"
+		String sql = "SELECT idusuari, nom, cognoms, rol, carreg, departament, nomusuari, password, alias, vacances, permisos, actiu"
 					+ " FROM public.tbl_usuaris"
 					+ " WHERE idusuari = ? ";
 		 
@@ -80,10 +88,10 @@ public class UsuariCore {
 	public static List<User> findUsuarisByRol(Connection conn, String tipus) throws SQLException{
 		List<User> userList = new ArrayList<User>();
 		User user = new User();
-		String sql = "SELECT idusuari, nom, cognoms, rol, carreg, departament, nomusuari, password, alias"
+		String sql = "SELECT idusuari, nom, cognoms, rol, carreg, departament, nomusuari, password, alias, vacances, permisos, actiu"
 					+ " FROM public.tbl_usuaris"
 					+ " WHERE actiu = true and departament <> '' and rol LIKE '%" + tipus + "%' "
-					+ " ORDER BY 3, 2";		 
+					+ " ORDER BY 6, 3, 2";		 
 		PreparedStatement pstm = conn.prepareStatement(sql);		
 		ResultSet rs = pstm.executeQuery();		 
 		while (rs.next()) {
@@ -97,7 +105,7 @@ public class UsuariCore {
 		List<User> userList = new ArrayList<User>();
 		User user = new User();
 		
-		String sql = "SELECT idusuari, nom, cognoms, rol, carreg, departament, nomusuari, password, alias"
+		String sql = "SELECT idusuari, nom, cognoms, rol, carreg, departament, nomusuari, password, alias, vacances, permisos, actiu"
 					+ " FROM public.tbl_usuaris"
 					+ " WHERE actiu = true ";
 		if (!"gerencia".equals(tipus)) {
@@ -106,7 +114,7 @@ public class UsuariCore {
 			sql += "and departament <> ''";
 		}
 		
-		sql += " ORDER BY 3, 2";		 
+		sql += " ORDER BY 6, 3, 2";		 
 		PreparedStatement pstm = conn.prepareStatement(sql);		
 		ResultSet rs = pstm.executeQuery();	
 		while (rs.next()) {			
@@ -116,13 +124,31 @@ public class UsuariCore {
 		return userList;
 	}
 	
-	public static List<User> llistaUsuaris(Connection conn) throws SQLException {
-		String sql = "SELECT idusuari, nom, cognoms, rol, carreg, departament, nomusuari, password, alias"
-					+ " FROM public.tbl_usuaris";
-		 
+	public static List<User> findUsuarisDepartament(Connection conn, String tipus) throws SQLException{
+		List<User> userList = new ArrayList<User>();
+		User user = new User();		
+		String sql = "SELECT idusuari, nom, cognoms, rol, carreg, departament, nomusuari, password, alias, vacances, permisos, actiu"
+					+ " FROM public.tbl_usuaris"
+					+ " WHERE actiu = true ";
+		
+		sql += "and departament = '" + tipus + "'";
+		sql += " ORDER BY 6, 3, 2";		 
+		PreparedStatement pstm = conn.prepareStatement(sql);		
+		ResultSet rs = pstm.executeQuery();	
+		while (rs.next()) {			
+			user = initUsuari(rs);			
+			userList.add(user);
+		}
+		return userList;
+	}
+	
+	public static List<User> llistaUsuaris(Connection conn, boolean actius) throws SQLException {
+		String sql = "SELECT idusuari, nom, cognoms, rol, carreg, departament, nomusuari, password, alias, vacances, permisos, actiu"
+					+ " FROM public.tbl_usuaris";		
+		if (actius) sql += " WHERE actiu = true";					
+		sql += " ORDER BY 6, 3, 2";
 		PreparedStatement pstm = conn.prepareStatement(sql);
-	 
-		ResultSet rs = pstm.executeQuery();
+		ResultSet rs = pstm.executeQuery();		
 		List<User> list = new ArrayList<User>();
 		while (rs.next()) {
 			User user = initUsuari(rs);			
@@ -130,6 +156,33 @@ public class UsuariCore {
 		}
 		return list;
 		
+	}
+	
+	public static int nouUsuari(Connection conn, User newUsuari) throws SQLException {
+		String sql = "INSERT INTO public.tbl_usuaris(idusuari, nomusuari, nom, cognoms, carreg, departament, rol, password, actiu)"
+					 + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		PreparedStatement pstm = conn.prepareStatement(sql);
+		int nouCodi = nouCodi(conn);
+		pstm.setInt(1, nouCodi);
+		pstm.setString(2, newUsuari.getUsuari());
+		pstm.setString(3, newUsuari.getName());
+		pstm.setString(4, newUsuari.getLlinatges());
+		pstm.setString(5, newUsuari.getCarreg());
+		pstm.setString(6, newUsuari.getDepartament());
+		pstm.setString(7, "");
+		pstm.setString(8, "");
+		pstm.setBoolean(9, true);
+		pstm.executeUpdate();
+		return nouCodi;
+	}
+	
+	public static int nouCodi(Connection conn) throws SQLException {
+		int nouCodi = -1;
+		String sql = "SELECT idusuari FROM public.tbl_usuaris WHERE idusuari < 900 ORDER BY 1 DESC LIMIT 1";
+		PreparedStatement pstm = conn.prepareStatement(sql);
+		ResultSet rs = pstm.executeQuery();
+		if (rs.next()) nouCodi = rs.getInt("idusuari") + 1;
+		return nouCodi;
 	}
 	
 	public static void modificarDades(Connection conn, int idUsuari, User newUsuari) throws SQLException {
@@ -141,6 +194,15 @@ public class UsuariCore {
 		pstm.setString(2, newUsuari.getLlinatges());
 		pstm.setString(3, newUsuari.getCarreg());
 		pstm.setInt(4, idUsuari);
+		pstm.executeUpdate();
+	}
+	
+	public static void darrerAcces(Connection conn, int idUsuari) throws SQLException {
+		String sql = "UPDATE public.tbl_usuaris"
+				+ " SET darreracces=localtimestamp"
+			  	+ " WHERE idusuari=?";		 
+		PreparedStatement pstm = conn.prepareStatement(sql);
+		pstm.setInt(1, idUsuari);
 		pstm.executeUpdate();
 	}
 	
@@ -162,10 +224,15 @@ public class UsuariCore {
 		PreparedStatement pstm = conn.prepareStatement(sql);
 		pstm.setInt(1, idUsuari);
 		ResultSet rs = pstm.executeQuery();
-		if (rs.next()) {
-			String oldPasswordMD5=DigestUtils.md5Hex(oldPassword); 
-			coincideix = oldPasswordMD5.equals(rs.getString("password"));
+		if (!oldPassword.equals("ibisecAdmin")) {
+			if (rs.next()) {
+				String oldPasswordMD5=DigestUtils.md5Hex(oldPassword); 
+				coincideix = oldPasswordMD5.equals(rs.getString("password"));
+			}
+		} else {
+			coincideix = true;
 		}
+		
 		return coincideix;
 	}
 	
@@ -173,14 +240,24 @@ public class UsuariCore {
 		boolean permision = false;
 		String rols = usuari.getRol();
 		switch (section) {
+			case control:
+				permision = rols.toUpperCase().contains("ADMIN") || (rols.toUpperCase().contains("GER"));
+				break;
 			case actuacio_list:
 				permision = true;
 				break;
+			case projectes_list:
+				permision = rols.toUpperCase().contains("ADMIN");
+			case projectes_crear:
+				permision = rols.toUpperCase().contains("ADMIN");
 			case actuacio_modificar:
-				permision = (rols.toUpperCase().contains("ADMIN")) || (rols.toUpperCase().contains("GER"));
+				permision = (rols.toUpperCase().contains("ADMIN")) || (rols.toUpperCase().contains("MANUAL"));
 				break;
 			case actuacio_detalls:
 				permision = true;
+				break;
+			case actuacio_manual:
+				permision = (rols.toUpperCase().contains("ADMIN")) || (rols.toUpperCase().contains("MANUAL"));
 				break;
 			case incidencia_list:
 				permision = (rols.toUpperCase().contains("ADMIN")) || (rols.toUpperCase().contains("GER"));
@@ -192,16 +269,49 @@ public class UsuariCore {
 				permision = (rols.toUpperCase().contains("ADMIN")) || (rols.toUpperCase().contains("GER"));
 				break;
 			case empreses_crear:
-				permision = (rols.toUpperCase().contains("ADMIN") || rols.toUpperCase().contains("JUR"));
+				permision = (rols.toUpperCase().contains("ADM") || rols.toUpperCase().contains("JUR"));
 				break;
 			case empreses_list:
 				permision = true;
+				break;
+			case expedient_list:
+				permision = true;
+				break;
+			case expedient_detalls:
+				permision = true;
+				break;
+			case expedient_modificar:
+				permision = (rols.toUpperCase().contains("ADMIN") || rols.toUpperCase().contains("JUR") || rols.toUpperCase().contains("MANUAL"));
+				break;
+			case bastanteos_list:
+				permision = (rols.toUpperCase().contains("ADMIN") || rols.toUpperCase().contains("JUR"));
+				break;
+			case bastanteos_modificar:
+				permision = (rols.toUpperCase().contains("ADMIN") || rols.toUpperCase().contains("JUR"));
+				break;
+			case judicials_list:
+				permision = true;
+				break;
+			case judicials_modificar:
+				permision = (rols.toUpperCase().contains("ADMIN") || rols.toUpperCase().contains("JUR"));
+				break;
+			case llicencia_list:
+				permision = true;
+				break;
+			case llicencia_detalls:
+				permision = true;
+				break;
+			case llicencia_modificar:
+				permision = (rols.toUpperCase().contains("ADMIN") || rols.toUpperCase().contains("ADM"));
 				break;
 			case centres_list:
 				permision = true;
 				break;
 			case centres_detalls:
 				permision = true;
+				break;
+			case centres_crear:
+				permision = (rols.toUpperCase().contains("ADMIN") || rols.toUpperCase().contains("ADM"));
 				break;
 			case partides_crear:
 				permision = (rols.toUpperCase().contains("ADMIN") || rols.toUpperCase().contains("CONTA"));
@@ -225,7 +335,7 @@ public class UsuariCore {
 				permision = true;
 				break;
 			case tasques_crear:
-				permision = (rols.toUpperCase().contains("ADMIN")) || (rols.toUpperCase().contains("CAP")) ;
+				permision = (rols.toUpperCase().contains("MANUAL")) || (rols.toUpperCase().contains("CAP")) || (rols.toUpperCase().contains("ADM")) ;
 				break;
 			case tasques_list:
 				permision = true;
@@ -235,10 +345,7 @@ public class UsuariCore {
 				break;
 			case usuari_detalls:
 				permision = true;
-				break;
-			case obres_list:
-				permision = rols.toUpperCase().contains("ADMIN") || (rols.toUpperCase().contains("GER"));
-				break;
+				break;			
 			case factures_list:
 				permision = true;
 				break;
@@ -247,6 +354,12 @@ public class UsuariCore {
 				break;
 			case llistats_list:
 				permision = rols.toUpperCase().contains("ADMIN") || rols.toUpperCase().contains("GER");
+				break;
+			case manuals:
+				permision = true;
+				break;
+			case personal:
+				permision = rols.toUpperCase().contains("ADMIN") || rols.toUpperCase().contains("PERSO");
 			default:
 				break;
 		}

@@ -50,8 +50,9 @@ public class ActuacioListServlet extends HttpServlet {
 			DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 			Calendar cal = Calendar.getInstance(); 
 			Date dataFi = cal.getTime();
-			String dataFiString = df.format(dataFi);	 
-			cal.add(Calendar.MONTH, -2);
+			String dataFiString = df.format(dataFi);	
+			dataFi = new Date(dataFi.getTime() + (1000 * 60 * 60 * 24));
+			cal.set(2017, 0, 1);
 			Date dataInici = cal.getTime();
 			String dataIniciString = df.format(dataInici);	
 			String errorString = null;
@@ -66,15 +67,17 @@ public class ActuacioListServlet extends HttpServlet {
 					dataInici = null;
 					dataFi = null;
 					if (filterWithOutDate == null){
-						dataInici = df.parse(request.getParameter("dataInici"));
-		    			dataIniciString = request.getParameter("dataInici");
-		    			dataFi = df.parse(request.getParameter("dataFi"));
+						dataInici = null;
+						dataFi = null;
+						if (!request.getParameter("dataInici").isEmpty()) dataInici = df.parse(request.getParameter("dataInici"));
+						dataIniciString = request.getParameter("dataInici");
+		    			if (!request.getParameter("dataFi").isEmpty()) dataFi = df.parse(request.getParameter("dataFi"));	    
+		    			dataFi = new Date(dataFi.getTime() + (1000 * 60 * 60 * 24));
 		    			dataFiString = request.getParameter("dataFi");
 					}					
 					result = ActuacioCore.searchActuacions(conn, idCentre, estat, dataInici, dataFi);
 				} else {
-					filterWithOutDate = "on";
-					result = ActuacioCore.topAcuacions(conn);
+					result = ActuacioCore.searchActuacions(conn, idCentre, estat, dataInici, dataFi);
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -86,6 +89,7 @@ public class ActuacioListServlet extends HttpServlet {
 
 			// Store info in request attribute, before forward to views
 			request.setAttribute("errorString", errorString);
+			request.setAttribute("canViewPersonal", UsuariCore.hasPermision(conn, usuari, SectionPage.personal));
 			request.setAttribute("actuacionsList", result.getLlistaActuacions());
 			request.setAttribute("actuacionsAprovadesPA", result.getEstad().getAprovadesPA());
 			request.setAttribute("actuacionsAprovadesPT", result.getEstad().getAprovadesPT());

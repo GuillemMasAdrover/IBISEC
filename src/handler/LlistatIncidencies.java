@@ -18,6 +18,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import bean.Incidencia;
+import core.CentreCore;
 import core.IncidenciaCore;
 import utils.MyUtils;
 
@@ -60,10 +61,12 @@ public class LlistatIncidencies extends HttpServlet {
         Connection conn = MyUtils.getStoredConnection(request);
         List<Incidencia> llistatIncidencies = new ArrayList<Incidencia>();
 		try {
-			llistatIncidencies = IncidenciaCore.searchIncidencies(conn, idCentre, true, null, null);
+			llistatIncidencies = IncidenciaCore.searchIncidencies(conn, idCentre, true, true, null, null);
 			myObj.addProperty("success", true);
 			JsonElement llistatObj = gson.toJsonTree(llistatIncidencies);
 			myObj.add("llistatIncidencies", llistatObj);
+			JsonElement nomCentreObj = gson.toJsonTree(CentreCore.nomCentre(conn, idCentre));
+			myObj.add("nomCentre", nomCentreObj);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

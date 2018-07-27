@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import bean.Actuacio;
 import core.ActuacioCore;
+import core.CentreCore;
 import utils.MyUtils;
 
 /**
@@ -46,7 +47,12 @@ public class DoCreateActuacioServlet extends HttpServlet {
 	    Actuacio actuacio = new Actuacio();
 	    actuacio.setReferencia(referencia);
 	    actuacio.setDescripcio(descripcio);
-	    actuacio.setIdCentre(idCentre);
+	    try {
+			actuacio.setCentre(CentreCore.findCentre(conn, idCentre, false));
+		} catch (SQLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 	    actuacio.setIdIncidencia(idIncidencia);
 	    actuacio.setIdUsuariCreacio(idUsuari);
 	    
@@ -58,17 +64,7 @@ public class DoCreateActuacioServlet extends HttpServlet {
 	  			e.printStackTrace();
 	  			errorString = e.getMessage();
 	   		}
-	   	}	    
-	   	//Registrar incidència
-	   	/*String comentari = request.getParameter("comentari");
-	   	int usuariTasca = Integer.parseInt(request.getParameter("idUsuari"));
-	   	try {
-			TascaCore.novaTasca(conn, "", usuariTasca, idUsuari, referencia, comentari, "");
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-	   	
+	   	}	
 	   	// Store infomation to request attribute, before forward to views.
 	   	request.setAttribute("errorString", errorString);
 	   	request.setAttribute("actuacio", actuacio);
@@ -79,7 +75,7 @@ public class DoCreateActuacioServlet extends HttpServlet {
 	   		dispatcher.forward(request, response);
 	   	}// If everything nice. Redirect to the product listing page.            
 	   	else {
-	   		response.sendRedirect(request.getContextPath() + "/actuacions");
+	   		response.sendRedirect(request.getContextPath() + "/actuacionsDetalls?ref=" + referencia);
 	   	}
 	}
 

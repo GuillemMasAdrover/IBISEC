@@ -4,9 +4,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -57,16 +62,37 @@ public class LlistatActuacions extends HttpServlet {
         response.setHeader("Access-Control-Allow-Headers", "Content-Type");
         response.setHeader("Access-Control-Max-Age", "86400");
         String idCentre = request.getParameter("idCentre");
+        String estat = request.getParameter("estat");
+        String tipus = request.getParameter("tipus");
+        String filterWithOutDate = request.getParameter("filterWithOutDate");
+		String filterWithOutDateExec = request.getParameter("filterWithOutDateExec");
+        DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+        Date dataInici = null; 
+        Date dataFi = null;
+        Date dataExecucioIni = null; 
+        Date dataExecucioFi = null;
         Gson gson = new Gson(); 
         JsonObject myObj = new JsonObject();
         Connection conn = MyUtils.getStoredConnection(request);
         List<Actuacio> llistatActuacions = new ArrayList<Actuacio>();
 		try {
-			llistatActuacions = ActuacioCore.searchActuacions(conn, idCentre, "AprovadaPT", null, null).getLlistaActuacions();
+			dataInici = null;
+			dataFi = null;
+			if ("false".equals(filterWithOutDate)){
+				dataInici = df.parse(request.getParameter("dataPeticioIni"));
+				dataFi = df.parse(request.getParameter("dataPeticioFi"));	
+			}
+			dataExecucioIni = null;
+			dataExecucioFi = null;
+			if ("false".equals(filterWithOutDateExec)){
+				dataExecucioIni = df.parse(request.getParameter("dataExecucioIni"));
+				dataExecucioFi = df.parse(request.getParameter("dataExecucioFi"));	
+			}						
+			llistatActuacions = ActuacioCore.searchActuacionsList(conn, idCentre, estat,  dataInici, dataFi, tipus, dataExecucioIni, dataExecucioFi);
 			myObj.addProperty("success", true);
 			JsonElement llistatObj = gson.toJsonTree(llistatActuacions);
 			myObj.add("llistatActuacions", llistatObj);
-		} catch (SQLException e) {
+		} catch (SQLException | ParseException | NamingException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			myObj.addProperty("success", false);

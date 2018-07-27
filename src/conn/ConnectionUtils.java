@@ -2,9 +2,11 @@ package conn;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.naming.NamingException;
+
 public class ConnectionUtils {
 	public static Connection getConnection()
-            throws ClassNotFoundException, SQLException {
+            throws ClassNotFoundException, SQLException, NamingException {
      
       return BDConnection.getPostgreConnection();
 	}

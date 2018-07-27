@@ -11,7 +11,7 @@ public class Partida {
 	private String nom;
 	private double totalPartida;
 	private double reservaPartida;
-	private double previstPartida;
+	private double contractatPartida;
 	private double pagatPartida;
 	private String tipus;
 	private boolean estat;
@@ -25,7 +25,7 @@ public class Partida {
 		this.nom = nom;
 		this.totalPartida = totalPartida;
 		this.reservaPartida = 0;
-		this.previstPartida = 0;
+		this.contractatPartida = 0;
 		this.tipus = tipus;
 		this.estat = estat;
 	}
@@ -76,7 +76,12 @@ public class Partida {
 	
 	public String getTotalPartidaFormat(){
 		DecimalFormat num = new DecimalFormat("#,##0.00");
-	    return num.format(totalPartida) + 'â‚¬';
+	    return num.format(totalPartida) + '€';
+	}
+	
+	public String getTotalPartidaString(){
+		DecimalFormat num = new DecimalFormat("###0.00");
+	    return num.format(totalPartida);
 	}
 	
 	public void setTotalPartida(double totalPartida){		
@@ -89,33 +94,33 @@ public class Partida {
 	
 	public String getReservaPartidaFormat(){
 		DecimalFormat num = new DecimalFormat("#,##0.00");
-	    return num.format(getReservaPartida()) + 'â‚¬';
+	    return num.format(getReservaPartida()) + '€';
 	}
 	
 	public void setReservaPartida(double reservaPartida){
 		this.reservaPartida = reservaPartida;
 	}
 	
-	public double getPrevistPartida(){
-		return previstPartida;
+	public double getContractatPartida(){
+		return contractatPartida;
 	}
 	
 	public String getPrevistPartidaFormat(){
 		DecimalFormat num = new DecimalFormat("#,##0.00");
-	    return num.format(previstPartida) + 'â‚¬';
+	    return num.format(contractatPartida) + '€';
 	}
 	
 	public void setPrevistPartida(double previstPartida){
-		this.previstPartida = previstPartida;
+		this.contractatPartida = previstPartida;
 	}
 	
 	public double getPartidaPerAsignar(){
-		return this.totalPartida - this.getPrevistPartida() - this.getReservaPartida();
+		return this.totalPartida - this.getContractatPartida() - this.getReservaPartida() - this.getPagatPartida();
 	}
 	
 	public String getPartidaPerAsignarFormat(){
 		DecimalFormat num = new DecimalFormat("#,##0.00");
-	    return num.format(getPartidaPerAsignar()) + 'â‚¬';
+	    return num.format(getPartidaPerAsignar()) + '€';
 	}
 
 	public double getPagatPartida() {
@@ -128,6 +133,6 @@ public class Partida {
 	
 	public String getPartidaPagatFormat(){
 		DecimalFormat num = new DecimalFormat("#,##0.00");
-	    return num.format(this.pagatPartida ) + 'â‚¬';
+	    return num.format(this.pagatPartida ) + '€';
 	}
 }

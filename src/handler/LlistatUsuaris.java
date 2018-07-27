@@ -60,7 +60,7 @@ public class LlistatUsuaris extends HttpServlet {
         Connection conn = MyUtils.getStoredConnection(request);
         List<User> llistatUsuaris = new ArrayList<User>();
 		try {
-			llistatUsuaris = UsuariCore.llistaUsuaris(conn);
+			llistatUsuaris = UsuariCore.llistaUsuaris(conn, true);
 			myObj.addProperty("success", true);
 			JsonElement llistatObj = gson.toJsonTree(llistatUsuaris);
 			myObj.add("llistatUsuaris", llistatObj);

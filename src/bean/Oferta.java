@@ -5,13 +5,17 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import utils.Fitxers;
+
 public class Oferta {
 	private String idOferta;
 	private String idActuacio;
 	private Actuacio actuacio;
 	private String cifEmpresa;
 	private String nomEmpresa;
-	private double vec;
+	private String capDobra;
+	private Fitxers.Fitxer personalInscrit;
+	private double pbase;
 	private double iva;
 	private double plic;
 	private String termini;
@@ -25,7 +29,8 @@ public class Oferta {
 	private User usuariCapValidacio;
 	private Date dataCapValidacio;
 	private String idInforme;
-	
+	private Fitxers.Fitxer presupost;
+		
 	public Oferta(){
 		
 	}
@@ -54,26 +59,18 @@ public class Oferta {
 		this.cifEmpresa = cifEmpresa;
 	}
 
-	public double getVec() {
-		return vec;
-	}
-
-	public String getVecFormat(){
+	public String getPbaseFormat(){
 		DecimalFormat num = new DecimalFormat("#,##0.00");
-	    return num.format(this.vec) + 'â‚¬';
+	    return num.format(this.pbase) + '€';
 	}
 	
-	public void setVec(double vec) {
-		this.vec = vec;
-	}
-
 	public double getIva() {
 		return iva;
 	}
 
 	public String getIvaFormat(){
 		DecimalFormat num = new DecimalFormat("#,##0.00");
-	    return num.format(this.iva) + 'â‚¬';
+	    return num.format(this.iva) + '€';
 	}
 	
 	public void setIva(double iva) {
@@ -89,8 +86,14 @@ public class Oferta {
 	}
 	
 	public String getPlicFormat(){
+		if (this.plic == 0) return "No presentada";
 		DecimalFormat num = new DecimalFormat("#,##0.00");
-	    return num.format(this.plic) + 'â‚¬';
+	    return num.format(this.plic) + '€';
+	}
+	
+	public String getPlicFormatNormal(){
+		DecimalFormat num = new DecimalFormat("#,##0.00");
+	    return num.format(this.plic) + '€';
 	}
 
 	public String getTermini() {
@@ -135,6 +138,13 @@ public class Oferta {
 
 	public Date getDataCreacio() {
 		return dataCreacio;
+	}
+	
+	public String getDataCreacioString() {
+		DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");	
+		String dataString = "";
+		if (this.dataCreacio != null) dataString = df.format(this.dataCreacio);
+		return dataString;	
 	}
 
 	public void setDataCreacio(Date dataCreacio) {
@@ -209,5 +219,37 @@ public class Oferta {
 
 	public void setActuacio(Actuacio actuacio) {
 		this.actuacio = actuacio;
+	}
+
+	public Fitxers.Fitxer getPresupost() {
+		return presupost;
+	}
+
+	public void setPresupost(Fitxers.Fitxer presupost) {
+		this.presupost = presupost;
+	}
+
+	public String getCapDobra() {
+		return capDobra;
+	}
+
+	public void setCapDobra(String capDobra) {
+		this.capDobra = capDobra;
+	}
+
+	public Fitxers.Fitxer getPersonalInscrit() {
+		return personalInscrit;
+	}
+
+	public void setPersonalInscrit(Fitxers.Fitxer personalInscrit) {
+		this.personalInscrit = personalInscrit;
+	}
+
+	public double getPbase() {
+		return pbase;
+	}
+
+	public void setPbase(double pbase) {
+		this.pbase = pbase;
 	}
 }

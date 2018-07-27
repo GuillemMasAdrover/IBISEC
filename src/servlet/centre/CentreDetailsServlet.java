@@ -48,10 +48,11 @@ public class CentreDetailsServlet extends HttpServlet {
 			   String codi = request.getParameter("codi");
 		       String errorString = null;
 		       boolean canViewIncidencies = false;
+		       boolean canCreateTasca = true;
 		       Centre centre = new Centre();			      
 		       try {
-		    	  centre = CentreCore.findCentre(conn, codi);
-		    	  canViewIncidencies = UsuariCore.hasPermision(conn, usuari, SectionPage.incidencia_list);
+		    	  centre = CentreCore.findCentre(conn, codi, true);
+		    	  canViewIncidencies = UsuariCore.hasPermision(conn, usuari, SectionPage.incidencia_list);		    	  
 		       } catch (SQLException e) {
 		           e.printStackTrace();
 		           errorString = e.getMessage();
@@ -60,6 +61,7 @@ public class CentreDetailsServlet extends HttpServlet {
 		       // Store info in request attribute, before forward to views
 		       request.setAttribute("errorString", errorString);
 		       request.setAttribute("canViewIncidencies", canViewIncidencies);
+		       request.setAttribute("canCreateTasca", canCreateTasca);
 		       request.setAttribute("centre", centre);
 		       request.setAttribute("menu", ControlPageCore.renderMenu(conn, usuari, "centres"));
 		       // Forward to /WEB-INF/views/homeView.jsp

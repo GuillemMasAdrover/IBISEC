@@ -13,6 +13,8 @@ public class Historic {
 	private String comentari;
 	private User usuari;
 	private Date data;
+	private String ipRemota;
+	private String tipus;
 	private List<Fitxers.Fitxer> adjunts;
 	public Historic() {
 
@@ -77,5 +79,21 @@ public class Historic {
 
 	public void setAdjunts(List<Fitxers.Fitxer> adjunts) {
 		this.adjunts = adjunts;
+	}
+
+	public String getIpRemota() {
+		return ipRemota;
+	}
+
+	public void setIpRemota(String ipRemota) {
+		this.ipRemota = ipRemota;
+	}
+
+	public String getTipus() {
+		return tipus;
+	}
+
+	public void setTipus(String tipus) {
+		this.tipus = tipus;
 	}
 }
